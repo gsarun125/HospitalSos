@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "45316741127",
+    "project_id": "hospital-sos",
+    "storage_bucket": "hospital-sos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45316741127:android:a64bb54039f90a79b5f2a2",
+        "android_client_info": {
+          "package_name": "com.ka.hospitalsos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZ67Laz5JXt_8FDAwrvRl1rWnGeyKYCrw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
