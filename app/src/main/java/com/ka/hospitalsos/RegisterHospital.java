@@ -123,11 +123,11 @@ public class RegisterHospital extends AppCompatActivity {
                 hospital.put("name", hospitalName);
                 hospital.put("address", hospitalAddress);
                 hospital.put("contact", hospitalContact);
-                hospital.put("Hospital Email",hospitalEmail);
-                hospital.put("Hospital Website",hospitalWebsite);
-                hospital.put("Hospital Description",hospitalDescription);
-                hospital.put("Has EmergencyCare",hasEmergencyCare);
-                hospital.put("Has Surgery",hasSurgery);
+                hospital.put("Hospital Email", hospitalEmail);
+                hospital.put("Hospital Website", hospitalWebsite);
+                hospital.put("Hospital Description", hospitalDescription);
+                hospital.put("Has EmergencyCare", hasEmergencyCare);
+                hospital.put("Has Surgery", hasSurgery);
                 hospital.put("fcmToken", fcmToken);
                 // Add hospital to Firestore
                 db.collection("hospitals")
@@ -138,7 +138,7 @@ public class RegisterHospital extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(RegisterHospital.this, "Hospital Registered Successfully", Toast.LENGTH_SHORT).show();
                                     // Clear EditText fields after successful registration
-                                    Intent i=new Intent(RegisterHospital.this, MainActivity.class);
+                                    Intent i = new Intent(RegisterHospital.this, MainActivity.class);
                                     startActivity(i);
                                     finish();
                                 } else {

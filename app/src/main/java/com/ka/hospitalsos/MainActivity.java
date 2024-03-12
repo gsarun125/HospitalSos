@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton menuButton = findViewById(R.id.menuButton);
         db = FirebaseFirestore.getInstance();
         sos = findViewById(R.id.sosButton);
-       startService(new Intent(this, NotificationCheckService.class));
+        //  startService(new Intent(this, NotificationCheckService.class));
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

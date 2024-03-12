@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -33,6 +34,7 @@ public class NotificationCheckService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         startForeground(NOTIFICATION_ID, createNotification());
     }
 
@@ -79,8 +81,15 @@ public class NotificationCheckService extends Service {
                     if (notification.getId() == 1) {
                         // Notification from the specific channel ID found
                         // You can perform further actions here
-                        updateNotification(notification.getId());
+                        Audio.playAudio(this);
                         Log.d("NotificationCheck", "Notification found from default_channel_id1");
+                        try {
+                            Thread.sleep(16000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+
                     }
                 }
             }
@@ -109,6 +118,7 @@ public class NotificationCheckService extends Service {
         }
         notificationManager.notify(notificationId, updatedNotification);
     }
+
     private Notification createNotification() {
         // Create a notification to keep the service running in the foreground
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -124,6 +134,14 @@ public class NotificationCheckService extends Service {
         }
 
         return builder.build();
+    }
+
+
+    private void playAudio() {
+        // Play your audio here
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound);
+        mediaPlayer.start();
+
     }
 
     @Nullable

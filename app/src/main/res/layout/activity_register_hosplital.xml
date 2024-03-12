@@ -45,6 +45,7 @@
             android:layout_marginBottom="8dp"
             android:hint="Contact Number"
             android:inputType="phone" />
+
         <EditText
             android:id="@+id/editTextHospitalEmail"
             android:layout_width="match_parent"
