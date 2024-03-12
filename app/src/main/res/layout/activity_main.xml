@@ -13,20 +13,22 @@
         android:layout_margin="15dp"
         android:background="@android:color/transparent"
         android:src="@drawable/menudotsvertical_24"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/sosButton" />
+        app:layout_constraintStart_toEndOf="@id/sosButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/sosButton"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:backgroundTint="@color/Green"
+        android:elevation="80dp"
+        android:foreground="?attr/selectableItemBackground"
         android:text="SOS"
         android:textColor="#FFFFFF"
-        android:textSize="40dp"
-        android:background="@drawable/round_button_bg"
+        android:textSize="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

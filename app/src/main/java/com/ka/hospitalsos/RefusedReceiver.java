@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-public class Action2Receiver extends BroadcastReceiver {
+public class RefusedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context, "Action 1 clicked", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Refused", Toast.LENGTH_SHORT).show();
     }
 }

@@ -1,18 +1,25 @@
 package com.ka.hospitalsos;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +28,11 @@ public class RegisterHospital extends AppCompatActivity {
     private EditText editTextHospitalName, editTextHospitalAddress, editTextHospitalContact;
     private Button buttonRegister;
 
-    // Firebase Firestore instance
+    private EditText editTextHospitalWebsite;
+    private EditText editTextHospitalEmail;
+    private EditText editTextHospitalDescription;
+    private CheckBox checkBoxEmergencyCare;
+    private CheckBox checkBoxSurgery;
     private FirebaseFirestore db;
 
     @Override
@@ -36,16 +47,61 @@ public class RegisterHospital extends AppCompatActivity {
         editTextHospitalName = findViewById(R.id.editTextHospitalName);
         editTextHospitalAddress = findViewById(R.id.editTextHospitalAddress);
         editTextHospitalContact = findViewById(R.id.editTextHospitalContact);
+
+        editTextHospitalWebsite = findViewById(R.id.editTextHospitalWebsite);
+        editTextHospitalEmail = findViewById(R.id.editTextHospitalEmail);
+        editTextHospitalDescription = findViewById(R.id.editTextHospitalDescription);
+        checkBoxEmergencyCare = findViewById(R.id.checkBoxEmergencyCare);
+        checkBoxSurgery = findViewById(R.id.checkBoxSurgery);
+
+
         buttonRegister = findViewById(R.id.buttonRegister);
 
         // Button click listener to register hospital
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registerHospital();
+                if (checkAllHospitalFields()) {
+                    registerHospital();
+                }
             }
         });
     }
+
+    private boolean checkAllHospitalFields() {
+
+        String hospitalName = editTextHospitalName.getText().toString().trim();
+        String hospitalAddress = editTextHospitalAddress.getText().toString().trim();
+        String hospitalContact = editTextHospitalContact.getText().toString().trim();
+        String hospitalEmail = editTextHospitalEmail.getText().toString().trim();
+        String hospitalDescription = editTextHospitalDescription.getText().toString().trim();
+
+        if (hospitalName.isEmpty() || hospitalAddress.isEmpty() || hospitalContact.isEmpty() || hospitalEmail.isEmpty() || hospitalDescription.isEmpty()) {
+            if (hospitalName.isEmpty()) {
+                editTextHospitalName.setError("Hospital Name is required");
+                editTextHospitalName.requestFocus();
+            }
+            if (hospitalAddress.isEmpty()) {
+                editTextHospitalAddress.setError("Hospital Address is required");
+                editTextHospitalAddress.requestFocus();
+            }
+            if (hospitalContact.isEmpty()) {
+                editTextHospitalContact.setError("Contact Number is required");
+                editTextHospitalContact.requestFocus();
+            }
+            if (hospitalEmail.isEmpty()) {
+                editTextHospitalEmail.setError("Hospital Email is required");
+                editTextHospitalEmail.requestFocus();
+            }
+            if (hospitalDescription.isEmpty()) {
+                editTextHospitalDescription.setError("Hospital Description is required");
+                editTextHospitalDescription.requestFocus();
+            }
+            return false;
+        }
+        return true;
+    }
+
 
     // Method to register hospital to Firestore
     private void registerHospital() {
@@ -53,7 +109,11 @@ public class RegisterHospital extends AppCompatActivity {
         String hospitalName = editTextHospitalName.getText().toString().trim();
         String hospitalAddress = editTextHospitalAddress.getText().toString().trim();
         String hospitalContact = editTextHospitalContact.getText().toString().trim();
-
+        String hospitalWebsite = editTextHospitalWebsite.getText().toString().trim();
+        String hospitalEmail = editTextHospitalEmail.getText().toString().trim();
+        String hospitalDescription = editTextHospitalDescription.getText().toString().trim();
+        boolean hasEmergencyCare = checkBoxEmergencyCare.isChecked();
+        boolean hasSurgery = checkBoxSurgery.isChecked();
         // Retrieve FCM token asynchronously
         retrieveFCMToken(new FCMTokenCallback() {
             @Override
@@ -63,8 +123,12 @@ public class RegisterHospital extends AppCompatActivity {
                 hospital.put("name", hospitalName);
                 hospital.put("address", hospitalAddress);
                 hospital.put("contact", hospitalContact);
+                hospital.put("Hospital Email",hospitalEmail);
+                hospital.put("Hospital Website",hospitalWebsite);
+                hospital.put("Hospital Description",hospitalDescription);
+                hospital.put("Has EmergencyCare",hasEmergencyCare);
+                hospital.put("Has Surgery",hasSurgery);
                 hospital.put("fcmToken", fcmToken);
-                System.out.println(fcmToken+"jkhgfdxghj");
                 // Add hospital to Firestore
                 db.collection("hospitals")
                         .add(hospital)
@@ -74,9 +138,9 @@ public class RegisterHospital extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(RegisterHospital.this, "Hospital Registered Successfully", Toast.LENGTH_SHORT).show();
                                     // Clear EditText fields after successful registration
-                                    editTextHospitalName.setText("");
-                                    editTextHospitalAddress.setText("");
-                                    editTextHospitalContact.setText("");
+                                    Intent i=new Intent(RegisterHospital.this, MainActivity.class);
+                                    startActivity(i);
+                                    finish();
                                 } else {
                                     Toast.makeText(RegisterHospital.this, "Failed to register hospital", Toast.LENGTH_SHORT).show();
                                 }
@@ -111,6 +175,7 @@ public class RegisterHospital extends AppCompatActivity {
     // Define a callback interface for FCM token retrieval
     interface FCMTokenCallback {
         void onTokenReceived(String fcmToken);
+
         void onFailure(Exception e);
     }
 }

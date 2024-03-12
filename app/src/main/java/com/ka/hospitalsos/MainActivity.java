@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -19,17 +20,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -44,14 +41,15 @@ public class MainActivity extends AppCompatActivity {
 
     private Button sos;
     private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ImageButton menuButton = findViewById(R.id.menuButton);
         db = FirebaseFirestore.getInstance();
-        sos=findViewById(R.id.sosButton);
-
+        sos = findViewById(R.id.sosButton);
+       startService(new Intent(this, NotificationCheckService.class));
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         sos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sos.setBackgroundColor(Color.RED);
+
                 getAllFCMTokens();
             }
         });
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            List<String> tokens = new ArrayList<>();
+                            HashSet<String> tokens = new HashSet<>();
                             for (DocumentSnapshot document : task.getResult()) {
                                 String fcmToken = document.getString("fcmToken");
                                 if (fcmToken != null) {
@@ -93,57 +93,58 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void sendNotification(List<String> tokens) {
-        // Construct notification message
-        Map<String, String> data = new HashMap<>();
-        data.put("title", "Emergency Alert");
-        data.put("message", "Emergency situation detected. Please take necessary actions.");
-
+    private void sendNotification(HashSet<String> tokens) {
         // Iterate through each token and send notification
-         for (String token : tokens) {
-             try{
-                 JSONObject jsonObject=new JSONObject();
-                 JSONObject notificationObj=new JSONObject();
+        for (String token : tokens) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                JSONObject notificationObj = new JSONObject();
+                JSONObject dataObj = new JSONObject();
+                notificationObj.put("title", "Emergency Alert");
+                notificationObj.put("body", "Emergency situation detected. Please take necessary actions.");
+                notificationObj.put("icon", "ambulance");
+                notificationObj.put("color", "#FA1818");
+                notificationObj.put("sound", "sound");
+                notificationObj.put("click_action", "com.ka.hospitalsos.CLICK_ACTION");
+                notificationObj.put(" default_vibrate_timings", false);
 
-                 notificationObj.put("title","Emergency Alert");
-                 notificationObj.put("body","dfhjdj");
-                 notificationObj.put("icon","ambulance");
-                 notificationObj.put("color","#FA1818");
-                 notificationObj.put("sound","sound.mp3");
-                 notificationObj.put("click_action","com.ka.hospitalsos.CLICK_ACTION");
-                 notificationObj.put(" default_vibrate_timings",false);
+                dataObj.put("emergency", true); // Add your custom data here
+                dataObj.put("location", "Hospital XYZ"); // Add additional data fields as needed
 
-                 JSONArray vibrateTimingsArray = new JSONArray();
-                 vibrateTimingsArray.put("0.0s");
-                 vibrateTimingsArray.put("0.2s");
-                 vibrateTimingsArray.put("0.1s");
-                 vibrateTimingsArray.put("0.2s");
-                 notificationObj.put("vibrate_timings", vibrateTimingsArray);
 
-                 jsonObject.put("notification",notificationObj);
-                 jsonObject.put("to",token);
-                 callApi(jsonObject);
-             }catch (Exception e){
+                JSONArray vibrateTimingsArray = new JSONArray();
+                vibrateTimingsArray.put("0.0s");
+                vibrateTimingsArray.put("0.2s");
+                vibrateTimingsArray.put("0.1s");
+                vibrateTimingsArray.put("0.2s");
+                notificationObj.put("vibrate_timings", vibrateTimingsArray);
 
-             }
-             Log.d("Notification", "Sending notification to token: " + token);
-         }
+                jsonObject.put("data", dataObj);
+                jsonObject.put("notification", notificationObj);
+                jsonObject.put("to", token);
+                callApi(jsonObject);
+            } catch (Exception e) {
 
-         // Show a toast indicating that notifications have been sent
+            }
+            Log.d("Notification", "Sending notification to token: " + token);
+        }
+
+        // Show a toast indicating that notifications have been sent
         Toast.makeText(MainActivity.this, "Notifications sent to all hospitals", Toast.LENGTH_SHORT).show();
 
 
     }
-    void  callApi(JSONObject jsonObject){
-     MediaType JSON = MediaType.get("application/json");
+
+    void callApi(JSONObject jsonObject) {
+        MediaType JSON = MediaType.get("application/json");
 
         OkHttpClient client = new OkHttpClient();
-        String url="https://fcm.googleapis.com/fcm/send";
-        RequestBody body=RequestBody.create(jsonObject.toString(),JSON);
-        Request request=new Request.Builder()
+        String url = "https://fcm.googleapis.com/fcm/send";
+        RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
+        Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .header("Authorization","Bearer AAAACo0WmAc:APA91bGaE8nY5xOm5DPocnYXeWqAXSJZ5-ZZCjLrDqF5KPt79NUs4aVh67mHKBGLvfjdwW6vOZxfd5_wrL0hFSPt1drfO-OqXix4UT36PL2HhcO-rFdbWVeISqJJZJMV1p41nKHUXFmP")
+                .header("Authorization", "Bearer AAAACo0WmAc:APA91bGaE8nY5xOm5DPocnYXeWqAXSJZ5-ZZCjLrDqF5KPt79NUs4aVh67mHKBGLvfjdwW6vOZxfd5_wrL0hFSPt1drfO-OqXix4UT36PL2HhcO-rFdbWVeISqJJZJMV1p41nKHUXFmP")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -174,14 +175,6 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.menu_item1) {
                     Intent i = new Intent(MainActivity.this, RegisterHospital.class);
                     startActivity(i);
-                    return true;
-                } else if (id == R.id.menu_item2) {
-                    // Handle menu item 2 click
-                    Toast.makeText(MainActivity.this, "Menu Item 2 clicked", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (id == R.id.menu_item3) {
-                    // Handle menu item 3 click
-                    Toast.makeText(MainActivity.this, "Menu Item 3 clicked", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 return false;
