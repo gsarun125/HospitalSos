@@ -1,5 +1,6 @@
 package com.ka.hospitalsos;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,24 +17,13 @@ public class RefusedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        dismissNotification(context);
         Audio.stopAudio();
-
-
         Toast.makeText(context, "Refused", Toast.LENGTH_SHORT).show();
     }
-
-    private void stopAudio() {
-        // Iterate through MediaPlayer instances to find the one playing
-        for (MediaPlayer mediaPlayer : mediaPlayerMap.values()) {
-            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayerMap.remove(mediaPlayer.hashCode());
-                Log.d("RefusedReceiver", "Audio stopped successfully");
-                return; // Stop after the first playing instance is found and stopped
-            }
-        }
-        Log.d("RefusedReceiver", "No audio is playing");
+    private void dismissNotification(Context context) {
+        // Dismiss the notification by using its ID
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(1); // Assuming you're using ID 1 for your notification
     }
-
 }

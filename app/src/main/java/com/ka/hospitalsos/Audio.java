@@ -18,13 +18,16 @@ public class Audio {
                 Log.d("playAudio", "Audio started successfully");
 
                 // Schedule the stop operation after 30 seconds (30000 milliseconds)
-                //    handler.postDelayed(stopPlaybackRunnable, 30000);
+                //   handler.postDelayed(stopPlaybackRunnable, 30000);
             } else {
                 Log.e("playAudio", "Failed to create MediaPlayer");
             }
         } catch (Exception e) {
             Log.e("playAudio", "Exception while playing audio: " + e.getMessage());
         }
+    }
+    public static boolean isPlaying() {
+        return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
     public static void stopAudio() {

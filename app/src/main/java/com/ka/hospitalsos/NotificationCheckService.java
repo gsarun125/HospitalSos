@@ -77,46 +77,73 @@ public class NotificationCheckService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
                 for (StatusBarNotification notification : notifications) {
-                    System.out.println(notification.getId());
-                    if (notification.getId() == 1) {
-                        // Notification from the specific channel ID found
-                        // You can perform further actions here
-                        Audio.playAudio(this);
-                        Log.d("NotificationCheck", "Notification found from default_channel_id1");
-                        try {
-                            Thread.sleep(16000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
+                    String channelId = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        channelId = notification.getNotification().getChannelId();
+                    }
+                    String channelName = getChannelName(notificationManager, channelId);
+                    System.out.println("Notification from channel: " + channelName);
+                    System.out.println("Notification ID: " + notification.getId());
 
+                    int id=notification.getId();
+                    if (channelName.equals("chanel2")){
+                        clearNotificationsByChannelIdAndName("0","FCM_Channel");
+
+                    }
+                    if(notification.getId()==1){
+                        if (Audio.isPlaying()) {
+                        } else {
+                            Audio.playAudio(this);
+                        }
+
+                        Log.d("NotificationCheck", "Notification found from channel: " + channelName);
+
+                    }
+                    if (channelName.equals("FCM_Channel") && id==0  ) {
+                        System.out.println("kljghjdkfjfdhjk");
+                        if (Audio.isPlaying()) {
+                        } else {
+                            Audio.playAudio(this);
+                        }
+
+                        Log.d("NotificationCheck", "Notification found from channel: " + channelName);
+                    }
+
+
+                }
+            }
+        }
+    }
+
+
+    private void clearNotificationsByChannelIdAndName(String channelId, String channelName) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+                for (StatusBarNotification notification : notifications) {
+                    String notificationChannelId = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        notificationChannelId = notification.getNotification().getChannelId();
+                    }
+                    String notificationChannelName = getChannelName(notificationManager, notificationChannelId);
+                    if (notificationChannelId.equals(channelId) && notificationChannelName.equals(channelName)) {
+                        int notificationId = notification.getId();
+                        notificationManager.cancel(notificationId);
                     }
                 }
             }
         }
     }
 
-    private void updateNotification(int notificationId) {
-        // Build the updated notification
-        Notification updatedNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Updated Notification Title")
-                .setContentText("Updated Notification Content")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .build();
-
-        // Notify the system to update the existing notification with the same ID
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+    private String getChannelName(NotificationManager notificationManager, String channelId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+            if (channel != null) {
+                return channel.getName().toString();
+            }
         }
-        notificationManager.notify(notificationId, updatedNotification);
+        return "Unknown";
     }
 
     private Notification createNotification() {

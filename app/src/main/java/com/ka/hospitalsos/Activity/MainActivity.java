@@ -1,10 +1,14 @@
-package com.ka.hospitalsos;
+package com.ka.hospitalsos.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -20,14 +24,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.ka.hospitalsos.NotificationCheckService;
+import com.ka.hospitalsos.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private Button sos;
     private FirebaseFirestore db;
 
+    private static final String CHANNEL_ID = "10";
+    private static final CharSequence CHANNEL_NAME = "FCM_Channel";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
         ImageButton menuButton = findViewById(R.id.menuButton);
         db = FirebaseFirestore.getInstance();
         sos = findViewById(R.id.sosButton);
-        //  startService(new Intent(this, NotificationCheckService.class));
+        createNotificationChannel(this);
+        createNotificationChannel2(this);
+        startService(new Intent(this, NotificationCheckService.class));
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +101,55 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+    public static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Define the notification channel ID and name
+            String channelId = CHANNEL_ID;
+            CharSequence channelName = CHANNEL_NAME;
+
+            // Set the importance level for the notification channel
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            // Create the notification channel
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+
+            // Optionally, configure additional settings for the channel, such as description, sound, and vibration
+            channel.setDescription("Channel for emergency alerts");
+            channel.enableLights(true);
+            channel.setLightColor(Color.RED);
+            channel.enableVibration(true);
+            channel.setVibrationPattern(new long[]{0, 1000, 500, 1000}); // Vibrate pattern if needed
+
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public static void createNotificationChannel2(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Define the notification channel ID and name
+            String channelId = "45";
+            CharSequence channelName = "chanel2";
+
+            // Set the importance level for the notification channel
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            // Create the notification channel
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+
+            // Optionally, configure additional settings for the channel, such as description, sound, and vibration
+            channel.setDescription("Channel for emergency alerts");
+            channel.enableLights(true);
+            channel.setLightColor(Color.RED);
+            channel.enableVibration(true);
+            channel.setVibrationPattern(new long[]{0, 1000, 500, 1000}); // Vibrate pattern if needed
+
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
 
     private void sendNotification(HashSet<String> tokens) {
         // Iterate through each token and send notification
@@ -104,8 +162,12 @@ public class MainActivity extends AppCompatActivity {
                 notificationObj.put("body", "Emergency situation detected. Please take necessary actions.");
                 notificationObj.put("icon", "ambulance");
                 notificationObj.put("color", "#FA1818");
-                notificationObj.put("sound", "sound");
                 notificationObj.put("click_action", "com.ka.hospitalsos.CLICK_ACTION");
+
+                notificationObj.put("android_channel_id","10");
+                notificationObj.put("notification_priority","PRIORITY_HIGH");
+
+                notificationObj.put("notification_count",2);
                 notificationObj.put(" default_vibrate_timings", false);
 
                 dataObj.put("emergency", true); // Add your custom data here

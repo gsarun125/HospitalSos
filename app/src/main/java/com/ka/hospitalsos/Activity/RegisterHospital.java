@@ -1,6 +1,4 @@
-package com.ka.hospitalsos;
-
-import static android.content.ContentValues.TAG;
+package com.ka.hospitalsos.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.ka.hospitalsos.R;
 
 import java.util.HashMap;
 import java.util.Map;
