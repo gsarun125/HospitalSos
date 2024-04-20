@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -36,6 +37,15 @@ public class AcceptedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         dismissNotification(context);
         Audio.stopAudio();
+        double latitude = intent.getDoubleExtra("latitude", 0.0);
+        double longitude = intent.getDoubleExtra("longitude", 0.0);
+
+        Uri gmmIntentUri = Uri.parse("google.navigation:q="+latitude+ ","+longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(mapIntent);
 
         db = FirebaseFirestore.getInstance();
         Toast.makeText(context, "Accepted", Toast.LENGTH_SHORT).show();

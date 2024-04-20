@@ -39,18 +39,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-
+        double latitude = 0;
+        double longitude = 0;
         if (remoteMessage.getData().size() > 0) {
             // Handle data payload
             Map<String, String> data = remoteMessage.getData();
 
             // Retrieve data fields
             String emergency = data.get("emergency");
-            String location = data.get("location");
+            String latitudeString = remoteMessage.getData().get("latitude");
+            String longitudeString = remoteMessage.getData().get("longitude");
+
+            if (latitudeString != null && longitudeString != null) {
+                latitude = Double.parseDouble(latitudeString);
+                longitude = Double.parseDouble(longitudeString);
+            } else {
+                // Handle the case where latitude or longitude extras are null
+                // You can log a message or provide default values, depending on your requirements
+            }
 
             // Process the retrieved data as needed
-            Log.d("ddd", "Emergency: " + emergency);
-            Log.d("ddd", "Location: " + location);
+            Log.d("ddd", "Emergency: " +longitude);
+            Log.d("ddd", "Location: " +  latitude );
 
             // Example: Display the notification content
             //  sendNotification(data);
@@ -74,6 +84,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 // Set onClickPendingIntent for the custom action buttons
                 Intent acceptedIntent = new Intent(this, AcceptedReceiver.class);
                 acceptedIntent.setAction("Accepted");
+                acceptedIntent.putExtra("latitude", latitude); // Add latitude as extra
+                acceptedIntent.putExtra("longitude", longitude);
+                
                 PendingIntent action1PendingIntent = PendingIntent.getBroadcast(this, 0, acceptedIntent, PendingIntent.FLAG_IMMUTABLE);
                 customNotificationActionsView.setOnClickPendingIntent(R.id.btn_action1, action1PendingIntent);
 

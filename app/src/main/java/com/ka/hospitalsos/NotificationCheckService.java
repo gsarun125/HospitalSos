@@ -71,7 +71,7 @@ public class NotificationCheckService extends Service {
         // Implement logic to check for notifications from the specific channel ID
         // You can use NotificationManager to check for notifications
         // For example, you can check if there are any notifications from the default channel ID
-        System.out.println("hhsdfghjkl;kjhgfdsgh");
+       // System.out.println("hhsdfghjkl;kjhgfdsgh");
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -82,8 +82,8 @@ public class NotificationCheckService extends Service {
                         channelId = notification.getNotification().getChannelId();
                     }
                     String channelName = getChannelName(notificationManager, channelId);
-                    System.out.println("Notification from channel: " + channelName);
-                    System.out.println("Notification ID: " + notification.getId());
+           //         System.out.println("Notification from channel: " + channelName);
+             //       System.out.println("Notification ID: " + notification.getId());
 
                     int id=notification.getId();
                     if (channelName.equals("chanel2")){
